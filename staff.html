@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Bite - Staff Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #d32f2f;
+            --secondary: #ffa000;
+            --accent: #4caf50;
+            --dark: #2e2e2e;
+            --light: #fff9e6;
+            --success: #388e3c;
+            --gold: #ffd700;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe0b2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        h2, h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        /* Staff Login Styles */
+        .staff-login {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .staff-login h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .staff-login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group input {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 160, 0, 0.2);
+        }
+
+        .staff-login button {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .staff-login button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Order Management Styles */
+        .order-management {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .order-management h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .order-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .order-filters button {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--secondary);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .order-filters button:hover {
+            background: var(--secondary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .order-filters button.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .orders-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .order-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .order-number {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .order-customer {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .order-table {
+            color: #777;
+        }
+
+        .order-status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-preparing {
+            background: #cce7ff;
+            color: #004085;
+        }
+
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-completed {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .order-items {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .order-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-total {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 15px 0;
+            text-align: right;
+            color: var(--dark);
+        }
+
+        .order-total span {
+            color: var(--accent);
+        }
+
+        .order-total span::before {
+            content: "₹";
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .order-actions button {
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-prepare {
+            background: #cce7ff;
+            color: #004085;
+        }
+
+        .btn-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .btn-complete {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .btn-view {
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        .btn-download {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn-delete:hover {
+            background: #f5c6cb;
+        }
+
+        .btn-download:hover {
+            background: #388e3c;
+        }
+
+        /* View Management */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Receipt Modal */
+        .receipt-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .receipt-modal.active {
+            display: flex;
+        }
+
+        .receipt-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 15px;
+        }
+
+        .receipt-header h2 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .receipt-details {
+            margin-bottom: 20px;
+        }
+
+        .receipt-details p {
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .receipt-items {
+            margin: 20px 0;
+        }
+
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .receipt-total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: right;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 2px solid var(--primary);
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+            font-style: italic;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .modal-actions button {
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-print {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-close-modal {
+            background: #e0e0e0;
+            color: var(--dark);
+        }
+
+        .modal-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .order-actions {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .order-filters {
+                justify-content: center;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <h1>Quick Bite Staff</h1>
+            <p class="tagline" style="font-family: 'Brush Script MT', cursive; font-size: 30px;">Order Management Portal</p>
+        </header>
+
+        <!-- Staff Login View -->
+        <div id="staff-login-view" class="view active">
+            <div class="staff-login">
+                <h2><i class="fas fa-user-shield"></i> Staff Login</h2>
+                <form id="staff-login-form" class="staff-login-form">
+                    <div class="form-group">
+                        <label for="staff-username"><i class="fas fa-user"></i> Username</label>
+                        <input type="text" id="staff-username" required placeholder="Enter username">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="staff-password"><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" id="staff-password" required placeholder="Enter password">
+                    </div>
+                    
+                    <button type="submit">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Order Management View -->
+        <div id="order-management-view" class="view">
+            <div class="order-management">
+                <h2><i class="fas fa-clipboard-list"></i> Order Management</h2>
+                
+                <div class="order-filters">
+                    <button id="filter-all" class="active">
+                        <i class="fas fa-list"></i> All Orders
+                    </button>
+                    <button id="filter-pending">
+                        <i class="fas fa-clock"></i> Pending
+                    </button>
+                    <button id="filter-preparing">
+                        <i class="fas fa-utensils"></i> Preparing
+                    </button>
+                    <button id="filter-ready">
+                        <i class="fas fa-check"></i> Ready
+                    </button>
+                    <button id="filter-completed">
+                        <i class="fas fa-check-double"></i> Completed
+                    </button>
+                </div>
+                
+                <div class="orders-list" id="orders-list">
+                    <!-- Orders will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receipt-modal" class="receipt-modal">
+        <div class="receipt-content" id="receipt-content">
+            <div class="receipt-header">
+                <h2>Quick Bite Restaurant</h2>
+                <p>Order Receipt</p>
+            </div>
+            <div class="receipt-details" id="receipt-details">
+                <!-- Receipt details will be populated by JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button id="print-receipt" class="btn-print">
+                    <i class="fas fa-print"></i> Print Receipt
+                </button>
+                <button id="download-receipt" class="btn-download">
+                    <i class="fas fa-download"></i> Download Receipt
+                </button>
+                <button id="close-modal" class="btn-close-modal">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App state
+        let allOrders = JSON.parse(localStorage.getItem('spiceGardenOrders')) || [];
+        let currentFilter = 'all';
+        let currentOrder = null;
+
+        // DOM elements
+        const staffLoginView = document.getElementById('staff-login-view');
+        const orderManagementView = document.getElementById('order-management-view');
+        const staffLoginForm = document.getElementById('staff-login-form');
+        const ordersList = document.getElementById('orders-list');
+        const filterAll = document.getElementById('filter-all');
+        const filterPending = document.getElementById('filter-pending');
+        const filterPreparing = document.getElementById('filter-preparing');
+        const filterReady = document.getElementById('filter-ready');
+        const filterCompleted = document.getElementById('filter-completed');
+        const receiptModal = document.getElementById('receipt-modal');
+        const receiptDetails = document.getElementById('receipt-details');
+        const printReceiptBtn = document.getElementById('print-receipt');
+        const downloadReceiptBtn = document.getElementById('download-receipt');
+        const closeModalBtn = document.getElementById('close-modal');
+
+        // Initialize the app
+        function init() {
+            setupEventListeners();
+        }
+
+        // Render orders for staff
+        function renderOrders(filter = 'all') {
+            ordersList.innerHTML = '';
+            
+            const filteredOrders = allOrders.filter(order => {
+                if (filter === 'all') return true;
+                return order.status === filter;
+            });
+            
+            if (filteredOrders.length === 0) {
+                ordersList.innerHTML = `<p style="text-align: center; padding: 20px; color: #777;">No ${filter === 'all' ? '' : filter} orders found.</p>`;
+                return;
+            }
+            
+            // Sort orders by timestamp (newest first)
+            filteredOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            filteredOrders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card';
+                
+                const orderHeader = document.createElement('div');
+                orderHeader.className = 'order-header';
+                
+                const orderInfo = document.createElement('div');
+                orderInfo.className = 'order-info';
+                
+                const orderNumber = document.createElement('div');
+                orderNumber.className = 'order-number';
+                orderNumber.textContent = order.id;
+                
+                const orderCustomer = document.createElement('div');
+                orderCustomer.className = 'order-customer';
+                orderCustomer.textContent = order.customerName;
+                
+                const orderTable = document.createElement('div');
+                orderTable.className = 'order-table';
+                orderTable.innerHTML = `<i class="fas fa-table"></i> Table ${order.tableNumber}`;
+                
+                const orderTime = document.createElement('div');
+                orderTime.className = 'order-time';
+                orderTime.innerHTML = `<i class="fas fa-clock"></i> ${new Date(order.timestamp).toLocaleTimeString()}`;
+                
+                const orderStatus = document.createElement('div');
+                orderStatus.className = `order-status status-${order.status}`;
+                orderStatus.textContent = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+                
+                orderInfo.appendChild(orderNumber);
+                orderInfo.appendChild(orderCustomer);
+                orderInfo.appendChild(orderTable);
+                orderInfo.appendChild(orderTime);
+                orderHeader.appendChild(orderInfo);
+                orderHeader.appendChild(orderStatus);
+                
+                const orderItems = document.createElement('ul');
+                orderItems.className = 'order-items';
+                
+                order.items.forEach(item => {
+                    const orderItem = document.createElement('li');
+                    orderItem.className = 'order-item';
+                    
+                    const itemName = document.createElement('span');
+                    itemName.textContent = item.name;
+                    
+                    const itemPrice = document.createElement('span');
+                    itemPrice.textContent = `₹${item.price}`;
+                    
+                    orderItem.appendChild(itemName);
+                    orderItem.appendChild(itemPrice);
+                    orderItems.appendChild(orderItem);
+                });
+                
+                const orderTotal = document.createElement('div');
+                orderTotal.className = 'order-total';
+                orderTotal.innerHTML = `Total: <span>${order.total}</span>`;
+                
+                const orderActions = document.createElement('div');
+                orderActions.className = 'order-actions';
+                
+                if (order.status === 'pending') {
+                    const prepareBtn = document.createElement('button');
+                    prepareBtn.className = 'btn-prepare';
+                    prepareBtn.innerHTML = '<i class="fas fa-utensils"></i> Start Preparing';
+                    prepareBtn.addEventListener('click', () => updateOrderStatus(order.id, 'preparing'));
+                    orderActions.appendChild(prepareBtn);
+                } else if (order.status === 'preparing') {
+                    const readyBtn = document.createElement('button');
+                    readyBtn.className = 'btn-ready';
+                    readyBtn.innerHTML = '<i class="fas fa-check"></i> Mark Ready';
+                    readyBtn.addEventListener('click', () => updateOrderStatus(order.id, 'ready'));
+                    orderActions.appendChild(readyBtn);
+                } else if (order.status === 'ready') {
+                    const completeBtn = document.createElement('button');
+                    completeBtn.className = 'btn-complete';
+                    completeBtn.innerHTML = '<i class="fas fa-check-double"></i> Mark Completed';
+                    completeBtn.addEventListener('click', () => updateOrderStatus(order.id, 'completed'));
+                    orderActions.appendChild(completeBtn);
+                } else if (order.status === 'completed') {
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'btn-download';
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Receipt';
+                    downloadBtn.addEventListener('click', () => showReceipt(order));
+                    orderActions.appendChild(downloadBtn);
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn-delete';
+                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Order';
+                    deleteBtn.addEventListener('click', () => deleteOrder(order.id));
+                    orderActions.appendChild(deleteBtn);
+                }
+                
+                const viewBtn = document.createElement('button');
+                viewBtn.className = 'btn-view';
+                viewBtn.innerHTML = '<i class="fas fa-eye"></i> View Details';
+                viewBtn.addEventListener('click', () => viewOrderDetails(order));
+                orderActions.appendChild(viewBtn);
+                
+                orderCard.appendChild(orderHeader);
+                orderCard.appendChild(orderItems);
+                orderCard.appendChild(orderTotal);
+                orderCard.appendChild(orderActions);
+                
+                ordersList.appendChild(orderCard);
+            });
+        }
+
+        // Update order status
+        function updateOrderStatus(orderId, newStatus) {
+            const orderIndex = allOrders.findIndex(order => order.id === orderId);
+            if (orderIndex !== -1) {
+                allOrders[orderIndex].status = newStatus;
+                localStorage.setItem('spiceGardenOrders', JSON.stringify(allOrders));
+                renderOrders(currentFilter);
+                showNotification(`Order ${orderId} status updated to ${newStatus}`);
+            }
+        }
+
+        // Delete order
+        function deleteOrder(orderId) {
+            if (confirm(`Are you sure you want to delete Order ${orderId}?`)) {
+                allOrders = allOrders.filter(order => order.id !== orderId);
+                localStorage.setItem('spiceGardenOrders', JSON.stringify(allOrders));
+                renderOrders(currentFilter);
+                showNotification(`Order ${orderId} has been deleted`);
+            }
+        }
+
+        // View order details
+        function viewOrderDetails(order) {
+            alert(`Order Details:\n\nOrder ID: ${order.id}\nCustomer: ${order.customerName}\nTable: ${order.tableNumber}\nStatus: ${order.status}\nTotal: ₹${order.total}\n\nItems:\n${order.items.map(item => `- ${item.name} (₹${item.price})`).join('\n')}`);
+        }
+
+        // Show receipt modal
+        function showReceipt(order) {
+            currentOrder = order;
+            
+            // Format the receipt details
+            const receiptHTML = `
+                <p><strong>Order ID:</strong> ${order.id}</p>
+                <p><strong>Customer:</strong> ${order.customerName}</p>
+                <p><strong>Table:</strong> ${order.tableNumber}</p>
+                <p><strong>Date:</strong> ${new Date(order.timestamp).toLocaleDateString()}</p>
+                <p><strong>Time:</strong> ${new Date(order.timestamp).toLocaleTimeString()}</p>
+                
+                <div class="receipt-items">
+                    <h3>Order Items:</h3>
+                    ${order.items.map(item => `
+                        <div class="receipt-item">
+                            <span>${item.name}</span>
+                            <span>₹${item.price}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="receipt-total">
+                    Total: ₹${order.total}
+                </div>
+                
+                <div class="receipt-footer">
+                    Thank you for dining with us!
+                </div>
+            `;
+            
+            receiptDetails.innerHTML = receiptHTML;
+            receiptModal.classList.add('active');
+        }
+
+      // Print receipt without breaking modal buttons
+function printReceipt() {
+    const receiptContent = document.getElementById('receipt-content').innerHTML;
+
+    // Open a new print window
+    const printWindow = window.open('', '', 'width=600,height=800');
+    printWindow.document.write(`
+        
+        
+         
+            <style>
+                body { font-family: 'Poppins', sans-serif; padding: 20px; }
+                .receipt-header { text-align: center; border-bottom: 2px solid #d32f2f; margin-bottom: 20px; }
+                .receipt-item { display: flex; justify-content: space-between; padding: 5px 0; }
+                .receipt-total { font-weight: bold; margin-top: 15px; text-align: right; }
+                .receipt-footer { margin-top: 20px; text-align: center; font-style: italic; color: #777; }
+            </style>
+
+      
+            ${receiptContent}
+      
+       
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+    }
+
+            // Re-initialize event listeners
+            setupModalEventListeners();
+        
+    
+      // Download receipt as PDF with proper styling & symbols
+function downloadReceiptAsPDF() {
+    const { jsPDF } = window.jspdf;
+    const receipt = document.getElementById('receipt-content');
+
+    html2canvas(receipt, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`QuickBite_Receipt_${currentOrder.id}.pdf`);
+    });
+}
+
+
+        // Show notification
+        function showNotification(message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--success);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 1000;
+                font-weight: 600;
+                transform: translateX(150%);
+                transition: transform 0.3s ease;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Animate out and remove
+            setTimeout(() => {
+                notification.style.transform = 'translateX(150%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Show specific view
+        function showView(view) {
+            // Hide all views
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+            
+            // Show selected view
+            if (view === 'staff-login') {
+                staffLoginView.classList.add('active');
+            } else if (view === 'order-management') {
+                orderManagementView.classList.add('active');
+                renderOrders(currentFilter);
+            }
+        }
+
+        // Set active filter
+        function setActiveFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.order-filters button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`filter-${filter}`).classList.add('active');
+        }
+
+        // Set up modal event listeners
+        function setupModalEventListeners() {
+            printReceiptBtn.addEventListener('click', printReceipt);
+            downloadReceiptBtn.addEventListener('click', downloadReceiptAsPDF);
+            closeModalBtn.addEventListener('click', () => {
+                receiptModal.classList.remove('active');
+            });
+            
+            // Close modal when clicking outside
+            receiptModal.addEventListener('click', (e) => {
+                if (e.target === receiptModal) {
+                    receiptModal.classList.remove('active');
+                }
+            });
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Staff login form
+            staffLoginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.getElementById('staff-username').value;
+                const password = document.getElementById('staff-password').value;
+                
+                // Simple authentication (in a real app, this would be more secure)
+                if (username === 'staff' && password === 'wasim123') {
+                    showView('order-management');
+                    staffLoginForm.reset();
+                } else {
+                    alert('Invalid credentials. Please try again.');
+                }
+            });
+            
+            // Order filters
+            filterAll.addEventListener('click', function() {
+                setActiveFilter('all');
+                renderOrders('all');
+            });
+            
+            filterPending.addEventListener('click', function() {
+                setActiveFilter('pending');
+                renderOrders('pending');
+            });
+            
+            filterPreparing.addEventListener('click', function() {
+                setActiveFilter('preparing');
+                renderOrders('preparing');
+            });
+            
+            filterReady.addEventListener('click', function() {
+                setActiveFilter('ready');
+                renderOrders('ready');
+            });
+            
+            filterCompleted.addEventListener('click', function() {
+                setActiveFilter('completed');
+                renderOrders('completed');
+            });
+            
+            // Set up modal event listeners
+            setupModalEventListeners();
+            
+            // Auto-refresh orders every 10 seconds
+            setInterval(() => {
+                if (orderManagementView.classList.contains('active')) {
+                    allOrders = JSON.parse(localStorage.getItem('spiceGardenOrders')) || [];
+                    renderOrders(currentFilter);
+                }
+            }, 1000);
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
