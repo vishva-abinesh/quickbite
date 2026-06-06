@@ -32,7 +32,7 @@ A modern, responsive web application that allows restaurant customers to browse 
 
 ## 🚀 Live Demo
 
-[Add your deployed link here]
+[(https://github.com/vishva-abinesh/quickbite.git)]
 
 ## 📂 Project Structure
 
