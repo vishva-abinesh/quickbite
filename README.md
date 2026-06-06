@@ -34,5 +34,5 @@ A modern, responsive web application that allows restaurant customers to browse 
 
 [(https://github.com/vishva-abinesh/quickbite.git)]
 
-## 📂 Project Structure
+
 
